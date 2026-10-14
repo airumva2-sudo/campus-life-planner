@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a class="skip-link" href="#main-field">Skip to the main content</a>
+    <header class="header">
+        <div class="header-content">
+            <h1>Campus Life Planner</h1>
+            <nav>
+                <a href="#">Dashboard</a>
+                <a href="#">Records</a>
+                <a href="#">Settings</a>
+            </nav>
+        </div>
+    </header>
+    <main id="main-field" tabindex="-1">
+        <section id="dashboard">
+            <h3>Dashboard</h3>
+            <p>Checkout your campus activities.</p>
+
+            <div class="container">
+
+                <article class="cards">
+                    <h3>Total Records</h3>
+                    <p id="total-duration">0</p>
+                </article>
+
+                <article class="cards">
+                    <h3>Total  Duration</h3>
+                    <P id="total-duration">0</P>
+                </article>
+
+                <article class="cards">
+                    <h3>Most Used Tag</h3>
+                    <p id="used-tag">None</p>
+                </article>
+
+                <article class="cards">
+                    <h3>Weeky Target</h3>
+                    <p id="target">Not set</p>
+                </article>
+            </div>
+            </section>
+            <section id="add-record">
+                <h3>Add a record</h3>
+                <form id="record" novalidate>
+                    <div>
+                        <label for="title">Title</label>
+                        <input type="text" id="title" name="title" placeholder="Enter a tast or event" aria-describedby="title-error" autocomplete="off">
+                        <span id="title-error" class="error-text"></span>
+                    </div>
+
+                    <div>
+                        <label for="date">Date</label>
+                        <input type="text" id="date" name="date"  placeholder="yyyy-mm-dd" aria-describedby="date-error" autocomplete="off">
+                        <span id="date-error" class="error-text"></span>
+                    </div>
+
+                    <div>
+                        <label for="duration">Duration</label>
+                        <input type="text" id="duration" name="duration" placeholder="e.g: 90" inputmode="decimal" aria-describedby="duration-error" autocomplete="off">
+                        <span id="duration-error" class="error-text"></span>
+                    </div>
+
+                    <div>
+                        <label for="tag">Tag</label>
+                        <input type="text" id="tag" name="tag" placeholder="e.g: Study" aria-describedby="tag-error" autocomplete="off">
+                        <span id="tag-error" class="error-text"></span>
+                    </div>
+
+                    <button type="submit">Add Record</button>
+                    <p id="form-status" role="status"></p>
+                </form>
+            </section>
+
+            <section id="sorting">
+                <h3>Searching and sorting</h3>
+
+                <div>
+                    <label for="search">Search records</label>
+                    <input type="search" id="search" placeholder="Searching..">
+                </div>
+
+                <div>
+                    <label for="case-sensitive">
+                        <input type="checkbox" id="case-sensitive">Case-sensitive search
+                    </label>
+                </div>
+
+                <div>
+                    <label for="sort">Sort</label>
+        <select id="sort">
+            <option value="date-asc">Date (oldest first)</option>
+            <option value="date-desc">Date (newest first)</option>
+            <option value="title-asc">Title (A-Z)</option>
+            <option value="duration-desc">Duration (longest first)</option>
+        </select>
+                </div>
+            </section>    
+            <section id="records">
+                <h3>Record List</h3>
+
+                <div id="records-list">
+                    <article class="record">
+                        <div class="record-info">
+                        <h3>Complete programming assignment</h3>
+                        <p>Date: 2026-10-15</p>
+                        <p>Duration: 2 hours</p>
+                        <p>Tag: Study</p>
+                        </div>
+
+                        <div class="recorde-actions">
+                        <button type="button" class="edit-button">Edit</button>
+                        <button type="button" class="delete-button">Delete</button>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </section>
+    </main>
+    <footer>
+        <h3>About and Contact</h3>
+        <p>Campus Life Planner helps university students to organize 
+            their tasks, events, study sessions and their personal activities.
+        </p>
+        <p>&copy; 2026 Campus Life Planner</p>
+    </footer>
+</body>
+</html>
