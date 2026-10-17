@@ -413,6 +413,9 @@ footer p {
         align-items: center;
         justify-content: space-between;
     }
+    #form-status {
+        grid-column: 1 / -1;
+    }
 }
 
 @media(min-width: 1024px) {

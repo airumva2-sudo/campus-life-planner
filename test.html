@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tests</title>
+    <style>
+        body {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            max-width: 700px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+        .pass {
+            color: #14532d;
+        }
+        .fail {
+            color: #b00020;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tests</h1>
+    <p id="Summary" role="status"></p>
+    <ul id="results"></ul>
+
+    <script type="module">
+
+        import {
+            patterns, validateTitle, validateDate, validateDuration, validateTag, isRealDate, normalizeTitle, validateRecord
+        } from './Scripts/validator.js';
+
+        let passed = 0, failed = 0;
+        const list = document.getElementById('results');
+
+        function test(name, actual, expected) {
+            const ok = actual === expected;
+            ok ? passed++ : failed++;
+            const li = document.createElement('li');
+            li.className = ok ? 'pass' : 'fail';
+            li.textContent = (ok ? 'PASS:' : 'FAIL') + name + (ok ? '' : ` (got ${actual}, expected ${expected})`);
+            list.appendChild(li);
+        }
+
+        test('title: normal text ok', patterns.title.test('Study hard'), true);
+        test('title: leading space rejected', patterns.title.test(' Study'), false);
+        test('title: trailing space rejected', patterns.title.test('Study '), false);
+        test('title: one character ok', patterns.title.test('A'), true);
+        test('title: double spaces collapse', normalizeTitle('Study  for exam'), 'Study for exam');
+
+        test('duration: 0 ok', patterns.duration.test('0'), true);
+        test('duration: 90 ok', patterns.duration.test('90'), true);
+        test('duration: 12.5 ok', patterns.duration.test('12.5'), true);
+        test('duration: 007 rejected', patterns.duration.test('007'), false);
+        test('duration: 1.234 rejected', patterns.duration.test('1.234'), false);
+        test('duration: -5 rejected', patterns.duration.test('-5'), false);
+        test('duration: letters rejected', patterns.duration.test('abc'), false);
+
+        test('date: 2026-10-15 ok', patterns.date.test('2026-10-15'), true);
+        test('date: month 13 rejected', patterns.date.test('2026-13-01'), false);
+        test('date: wrong format rejected', patterns.date.test('15/10/2026'), false);
+        test('date: Feb 30 passes the regex..', patterns.date.test('2026-02-30'), true);
+        test('date: is not a real date', isRealDate('2024-02-30'), false);
+        test('date: leap day 2024-02-29 is real', isRealDate('2024-02-29'), true);
+        test('date: 2026-02-29 is not real', isRealDate('2026-02-29'), false);
+
+        test('tag: School ok', patterns.tag.test('School'), true);
+        test('tag: Part-time job ok', patterns.tag.test('Part-time job'), true);
+        test('tag: digits rejected', patterns.tag.test('School2'), false);
+        test('tag: leading hyphen rejected', patterns.tag.test('-School'), false);
+        test('tag: double space rejected', patterns.tag.test('Study  Group'), false);
+
+        test('duplicate: "the the" found', patterns.duplicateWord.test('Study the the exam'), true);
+        test('duplicate: "The the" found (ignores case)', patterns.duplicateWord.test('The the exam'), true);
+        test('duplicate: "the theory" Not found', patterns.duplicateWord.test('the theory exam'), false);
+        test('duplicate: normal title not flagged', patterns.duplicateWord.test('Study for exam'), false);
+
+        test('validateTitle: empty gives a message', validateTitle('') !== '', true);
+        test('validateTitle: good title gives empty text', validateTitle('Study hard'), '');
+        test('validateDuration: good', validateDuration('45'), '');
+        test('validateDate: good', validateDate('2026-10-15'), '');
+        test('validateTag: good', validateTag('School'), '');
+
+        test('validateRecord: good form has no errors',
+            Object.keys(validateRecord({ title: 'Study', date: '2026-10-15', duration: '90', tag: 'School'})).length, 0
+        );
+        test('validateRecord: bad form reports each bad field',
+            Object.keys(validateRecord({ title: '', date: 'nope', duration: '007', tag: '1'})).length,4
+        );
+
+        document.getElementById('Summary').textContent = `${passed} passed, ${failed} failed.`;
+    </script>
+    
+</body>
+</html>
