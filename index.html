@@ -118,6 +118,14 @@
         <section id="settings">
             <h3>Settings</h3>
 
+            <div class="setting-block">
+            <label for="unit">Show Durations in</label>
+            <select id="unit" name="unit">
+                <option value="minutes">Minutes</option>
+                <option value="hours">Hours</option>
+            </select>
+            </div>
+
             <form id="cap-form" novalidate>
                 <div>
                     <label for="cap">Weekly target (minutes, 0 = no target)</label>
@@ -128,6 +136,19 @@
                 <button type="submit">Save target</button>
                 <p id="cap-status" role="status"></p>
             </form>
+
+            <div class="setting-block">
+                <h3 class="settings-subtitle">Your data</h3>
+                <p class="hint">Your records and settings are saved in this browser automatically.</p>
+                <div class="button-row">
+                    <button type="button" id="export-btn">Export JSON</button>
+                    <button type="button" id="sample-btn">Load sample data</button>
+                </div>
+                <label for="import-file">Import a JSON file</label>
+                <input type="file" id="import-file" accept=".json,application/json">
+                <p id="data-status" role="status"></p>
+                <p id="import-error" class="erro-text" role="alert"></p>
+            </div>
         </section>    
     </main>
     <footer>

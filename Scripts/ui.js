@@ -1,8 +1,10 @@
 import {escapeHtml, highlight} from './search.js';
+import {formatDuration} from './stats.js';
+
 const list = document.querySelector('#records-list');
 const $ = (selector) => document.querySelector(selector);
 
-export function renderRecords(records, re) {
+export function renderRecords(records, re, unit = 'minutes') {
     if (records.length === 0) {
         list.innerHTML = '<p class="empty-message">No records to show.</p>';
         return;
@@ -13,7 +15,7 @@ export function renderRecords(records, re) {
     <div class="record-info">
     <h3>${highlight(r.title, re)}</h3>
     <p>Date: ${highlight(r.dueDate, re)}</p>
-    <p>Duration: ${escapeHtml(r.duration)} min</p>
+    <p>Duration: ${escapeHtml(formatDuration(r.duration, unit))}</p>
     <p>Tag: ${highlight(r.tag, re)}</p>
     </div>
     <div class="record-actions">
@@ -23,18 +25,17 @@ export function renderRecords(records, re) {
     </article>`).join('');
 }
 
-export function renderStats(stats, cap) {
+export function renderStats(stats, cap, unit = 'minutes') {
     $('#total-records').textContent = stats.totalRecords;
-    $('#total-duration').textContent = stats.totalDuration + ' min';
+    $('#total-duration').textContent = formatDuration(stats.totalDuration, unit);
     $('#used-tag').textContent = stats.topTag;
-    $('#target').textContent = cap ? cap + ' min' : 'Not set';
+    $('#target').textContent = cap ? formatDuration(cap, unit) : 'Not set';
 
     const biggest = Math.max(1, ...stats.trend.map((day) => day.minutes));
     $('#trend-chart').innerHTML = stats.trend.map((day) => {
        const percent = Math.round((day.minutes / biggest) * 100);
-       const label = `${day.date}: ${day.minutes} minutes`;
-       return 
-       `<li>
+       const label = `${day.date}: ${formatDuration(day.minutes, unit)}`;
+       return `<li>
         <div class="bar-wrap">
         <span class="bar" style="height:${percent}%" role="img" aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}"></span>
         </div>

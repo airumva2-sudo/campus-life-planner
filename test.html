@@ -38,8 +38,14 @@
             sortRecords
         } from './Scripts/state.js';
         import {
-            computeStats, capStatus, validateCap, round2, toDateString
+            computeStats, capStatus, validateCap, round2, toDateString, formatDuration
         } from './Scripts/stats.js';
+        import {
+            validateImport, recordsToJson
+        } from './Scripts/portability.js';
+        import {
+            loadRecords, saveRecords, loadSettings, saveSettings
+        } from './Scripts/storage.js';
 
         let passed = 0, failed = 0;
         const list = document.getElementById('results');
@@ -164,6 +170,42 @@
         test('validateCap: 0 ok', validateCap('0'), '');
         test('validateCap: -5 rejected', validateCap('-5') !== '', true);
         test('validateCap: letters rejected', validateCap('abc') !== '', true);
+
+        test('format: minutes', formatDuration(90, 'minutes'), '90 min');
+        test('format: hours', formatDuration(90, 'hours'), '1.5h');
+        test('format: default is minutes', formatDuration(45), '45min');
+        test('cap in hours: polite text', capStatus(60, 600, 'hours').text, '9 hours remaining of your 10 hours target.');
+        test('cap in hours: assertive text', capStatus(720, 600, 'hours').text, 'Over your weekly target by 2 hours!');
+
+        const goodRecord = { id: 'rec_0001', title: 'Study', dueDate: '2026-10-15', duration: 90, tag: 'School', createdAt: '2026-10-01T08:00:00.000Z', updatedAt: '2026-10-01T08:00:00.000Z'};
+
+        test('import: good file is accepted', validateImport([goodRecord]).errors.length, 0);
+        test('import: good file gives records back', validateImport([goodRecord]).records.length, 1);
+        test('import: empty file is fine', validateImport([]).errors.length, 0);
+        test('import: not a list is rejected', validateImport({ a: 1 }).errors.length, 1);
+        test('import: text is rejected', validateImport('hello').errors.length, 1);
+        test('import: item that is not an object', validateImport([5]).errors.length, 1);
+        test('import: missing field', validateImport([{ ...goodRecord, tag: undefined}]).errors.length > 0, true);
+        test('import: duration as text is rejected', validateImport([{ ...goodRecord, duration: '90'}]).errors.length > 0, true);
+        test('import: bad date is rejected', validateImport([{ ...goodRecord, dueDate:'2026-02-30'}]).errors.length > 0, true);
+        test('import: regex rules apply to titles', validateImport([{ ...goodRecord, title: 'go go home'}]).errors.length > 0, true);
+        test('import: bad timestamp is rejected', validateImport([{ ...goodRecord, createdAt: 'yesterday'}]).errors.length > 0, true);
+        test('import: duplicate ids are rejected', validateImport([goodRecord, goodRecord]).errors.length > 0, true);
+        test('import: one bad record rejects everything', validateImport([goodRecord, { ...goodRecord, id: 'rec_0002', tag: '1'}]).records.length, 0);
+        test('import: extra fields are dropped', 'extra' in validateImport([{ ...goodRecord, extra: 1}]).records[0], false);
+        test('export: JSON text can be read back', JSON.parse(recordsToJson([goodRecord]))[0].title, 'Study');
+
+        saveRecords([goodRecord], 'test:records');
+        test('storage: saved records load back', loadRecords('test:records')[0].id, 'rec_0001');
+        test('storage: nothing saved gives null', loadRecords('test:missing'), null);
+        localStorage.setItem('test:broken', '{oops');
+        test('storage: broken text gives null, not a crash', loadRecords('test:broken'), null);
+        test('storage: settings load back', (saveSettings({ unit: 'hours', cap: 600}, 'test:settings'), loadSettings('test:settings').unit), 'hours');
+        test('storage: missing settings use defaults', loadSettings('test:missing').unit, 'minutes');
+        test('storage: settings keep the cap', loadSettings('test:settings').cap, 600);
+        test('storage: broken settings use defaults', loadSettings('test:broken').cap, 0);
+        ['test:records', 'test:broken', 'test:settings'].forEach((key) => localStorage.removeItem(key));
+
 
         document.getElementById('Summary').textContent = `${passed} passed, ${failed} failed.`;
     </script>

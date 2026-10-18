@@ -2,6 +2,7 @@ export const state = {
     records: [],
     editingId:null,
     cap: 0,
+    unit:'minutes',
 };
 
 export async function loadSeed() {

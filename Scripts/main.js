@@ -3,6 +3,9 @@ import { state, loadSeed, addRecord, updateRecord, deleteRecord, getRecord, sort
 import { compileRegex } from './search.js';
 import { renderRecords, renderStats, renderCap } from './ui.js';
 import { computeStats, capStatus, validateCap } from './stats.js';
+import { loadRecords, saveRecords, loadSettings, saveSettings } from './storage.js';
+import { validateImport, recordsToJson } from './portability.js';
+
 
 const form = document.querySelector('#record');
 const status = document.querySelector('#form-status');
@@ -14,7 +17,31 @@ const sortMenu = document.querySelector('#sort');
 const searchMessage = document.querySelector('#search-message');
 const resultCount = document.querySelector('#result-count');
 const list = document.querySelector('#records-list');
+const unitMenu = document.querySelector('#unit');
+const capForm = document.querySelector('#cap-form');
+const capInput = document.querySelector('#cap');
+const capError = document.querySelector('#cap-error');
+const capSaved = document.querySelector('#cap-status');
+const exportButton = document.querySelector('#export-btn');
+const sampleButton = document.querySelector('#sample-btn');
+const importFile = document.querySelector('#import-file');
+const dataStatus = document.querySelector('#data-status');
+const importError = document.querySelector('#import-error');
 const fieldIds = ['title', 'date', 'duration', 'tag'];
+
+
+function persist() {
+    const savedRecords = saveRecords(state.records);
+    const savedSettings = saveSettings({unit: state.unit, cap: state.cap});
+    if ( !savedRecords || !savedSettings) {
+        dataStatus.textContent = 'Warning: your browser would not save your data, so it will be lost when you close this page.';
+    }
+}
+
+function changed () {
+    persist();
+    refresh();
+}
 
 function refresh() {
     const { re, error } = compileRegex(searchBox.value, caseBox.checked);
@@ -25,10 +52,10 @@ function refresh() {
         shown = shown.filter((r) => re.test(r.title) || re.test(r.tag) || re.test(r.dueDate));  
     }
     shown = sortRecords(shown, sortMenu.value);
-    renderRecords(shown, re);
+    renderRecords(shown, re, state.unit);
     const stats = computeStats(state.records);
-    renderStates(stats, state.cap);
-    renderCap(capStatus(stats.totalDuration, state.cap));
+    renderStats(stats, state.cap, state.unit);
+    renderCap(capStatus(stats.totalDuration, state.cap, state.unit));
     resultCount.textContent = `Showing ${shown.length} of ${state.records.length} records.`;  
 }
 
@@ -122,10 +149,11 @@ list.addEventListener('click', (event) => {
         document.querySelector('#title').focus();
     }
 }); 
-const capFrom = document.querySelector('#cap-form');
-const capInput = document.querySelector('#cap');
-const capError = document.querySelector('#cap-error');
-const capSaved = document.querySelector('#cap-status');
+
+unitMenu.addEventListener('change', () => {
+    state.unit = unitMenu.value;
+    changed();
+});
 
 capFrom.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -142,10 +170,80 @@ capFrom.addEventListener('submit', (event) => {
     capSaved.textContent = state.cap ? 'Weekly target saved.' : 'Weekly target removed.';
     refresh();
 });
+
 capInput.addEventListener('input', () =>{
     capError.textContent = '';
     capInput.removeAttribute('aria-invalid');
 });
 
-await loadSeed();
-refresh();
+exportButton.addEventListener('click', () => {
+    const blob = new Blog([recordsToJson(state.records)], { type: 'application/json'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `campus-life-planne-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+    importError.textContent = '';
+    dataStatus.textContent = `Exported ${state.records.length} records.`; 
+});
+
+importFile.addEventListener('change', async() => {
+    const file = importFile.files[0];
+    importError.textContent = '';
+    dataStatus.textContent = '';
+    if (!file)
+        return;
+
+    let data;
+    try {
+        data = JSON.parse(await file.text());
+    }
+    catch {
+        importError.textContent = 'That file is not valid JSON, so nothing was imported.';
+        importFile.value = '';
+        return;
+    }
+
+    const {records, errors} = validateImport(data);
+    if (errors.length > 0) {
+        const shown = errors.slice(0,5).join('');
+        const more = errors.length > 5 ? ` ...and ${errors.length - 5} more problems.` : '';
+        importError.textContent = `Nothing was imported. ${shown}${more}`;
+        importFile.value = '';
+        return;
+    }
+
+    if (!confirm(`Replace your ${state.records.length} records with the ${records.length} records in this file?`)) {
+        importFile.value = '';
+        return;
+    }
+    state.records = records;
+    resetForm();
+    changed();
+    dataStatus.textContent = `Imported ${records.length} records.`;
+    importFile.value = '';
+});
+
+sampleButton.addEventListener('click', async() => {
+    if (!confirm('Replace your records with the sample data?'))
+        return;
+    await loadSeed();
+    resetForm();
+    changed();
+    importError.textContent = '';
+    dataStatus.textContent = 'Sample data loaded.';
+});
+
+const savedRecords = loadRecords();
+if (savedRecords) {
+    state.records = savedRecords;
+} else {
+    await loadSeed();
+}
+
+const settings = loadSettings();
+state.unit = settings.unit;
+state.cap = settings.cap;
+unitMenu.value = state.unit;
+capInput.value = state.cap ? state.cap : '';
+changed();

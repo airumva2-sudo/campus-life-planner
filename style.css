@@ -474,6 +474,7 @@ footer p {
     display: grid;
     gap: 12px;
     max-width: 420px;
+    margin-top: 20px;
 }
 
 #cap-form > div {
@@ -495,6 +496,52 @@ footer p {
 #cap-status {
     color: var(--muted-color);
 }
+
+.setting-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 420px;
+    margin-top: 20px;
+}
+
+.setting-block:first-of-type {
+    margin-top: 0;
+}
+
+.settings-subtitle {
+    font-size: 15px;
+    font-weight: 650;
+}
+.hint {
+    color: var(--muted-color);
+    font-size: 13px;
+}
+
+.button-row { 
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.setting-block button { 
+    background: #172945;
+    color: #c9dcff;
+    border-color: #355078;
+}
+
+.setting-block button:hover {
+    background: #233e65;
+}
+
+input[type="file"] {
+    padding: 10px 12px;
+    cursor: pointer;
+}
+ #data-status {
+    color: var(--muted-color);
+ }
 
 @media (min-width: 360px) {
     .container {

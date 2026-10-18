@@ -4,6 +4,10 @@ export function round2(number) {
     return Math.round(number*100) / 100;
 }
 
+export function formatDuration(minutes, unit = 'minutes') {
+    return unit === 'hours' ? `${round2(minutes / 60)} h` : `${round2(minutes)} min`;
+}
+
 export function toDateString(date) {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
@@ -51,18 +55,20 @@ export function validateCap(value) {
     return '';
 }
 
-export function capStatus(totalDuration, cap) {
+export function capStatus(totalDuration, cap, unit = 'minutes') {
     if (!cap) 
         return null;
+    const words = unit === 'hours' ? ['hours', 'hour'] : ['minutes', 'minute'];
+    const show = (minutes) => round2(unit === 'hours' ? minutes / 60 : minutes);
     const difference = round2(cap - totalDuration);
     if (difference >= 0) {
         return {
             level: 'polite',
-            text: `${difference} minutes remaining of your ${cap} minute target.`,
+            text: `${show(difference)} ${words[0]} remaining of your ${show(cap)} ${words[1]} target.`,
         };
     }
     return {
         level: 'assertive',
-        text: `Over your weekly target by ${round2(-difference)} minutes!`,
+        text: `Over your weekly target by ${show(-difference)} ${words[0]}!`,
     };
 }
