@@ -1,0 +1,13 @@
+[
+    {"id":"rec_0001","title":"Study for physics exam","dueDate":"2026-10-09","duration":120,"tag":"School","createdAt":"2026-10-01T08:00:00.000Z","updatedAt":"2026-10-01T08:00:00.000Z"},
+    {"id":"rec_0002","title":"Team meeting at 14:45","dueDate":"2026-10-20","duration":60,"tag":"Group Project","createdAt":"2026-10-11T09:15:00.000Z","updatedAt":"2026-10-11T09:15:00.000Z"},
+    {"id":"rec_0003","title":"Gym session at 07:00","dueDate":"2026-10-18","duration":45,"tag":"Sport","createdAt":"2026-10-17T10:00:00.000Z","updatedAt":"2026-10-17T12:30:00.000Z"},
+    {"id":"rec_0004","title":"Reviewing essay draft","dueDate":"2026-10-18","duration":30.5,"tag":"School","createdAt":"2026-10-17T11:00:00.000Z","updatedAt":"2026-10-17T11:00:00.000z"},
+    {"id":"rec_0005","title":"Hackthon weekend marathon","dueDate":"2026-10-24","duration":120,"tag":"Coding club","createdAt":"2026-10-10T16:00:00.000Z","updatedAt":"2026-10-12T08:00:00.000Z"},
+    {"id":"rec_0006","title":"Digno's birthday party","dueDate":"2026-10-24","duration":180,"tag":"Social life","createdAt":"2026-10-18T16:00:00.000Z","updatedAt":"2026-10-18T16:00:00.000Z"},
+    {"id":"rec_0007","title":"Year-end exam results","dueDate":"2026-12-05","duration":15,"tag":"School","createdAt":"2026-10-18T16:00:00.000Z","updatedAt":"2026-10-18T16:00:00.000Z"},
+    {"id":"rec_0008","title":"Spider-man movie night","dueDate":"2026-10-19","duration":130,"tag":"Social life","createdAt":"2026-10-17T14:00:00.000Z","updatedAt":"2026-10-17T14:00:00.000z"},
+    {"id":"rec_0009","title":"Part-time shift at the library","dueDate":"2026-10-19","duration":240,"tag":"Job","createdAt":"2026-10-18T20:00:00.000Z","updatedAt":"2026-10-18T20:00:00.000Z"},
+    {"id":"rec-0010","title":"Call with mom","dueDate":"2026-10-18","duration":60,"tag":"Family","createdAt":"2026-10-17T12:33:00.000Z","updatedAt":"2026-10-17T12:33:00.000Z"},
+    {"id":"rec_0011","title":"Going shopping","dueDate":"2026-10-20","duration":120,"tag":"Social life","createdAt":"2026-10-10T18:45:00.000Z","updatedAt":"2026-10-10T18:45:00.000Z"}
+]

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Campus Life Planner</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:,">
 </head>
 <body>
     <a class="skip-link" href="#main-field">Skip to the main content</a>
@@ -12,9 +13,9 @@
         <div class="header-content">
             <h1>Campus Life Planner</h1>
             <nav>
-                <a href="#">Dashboard</a>
-                <a href="#">Records</a>
-                <a href="#">Settings</a>
+                <a href="#dashboard">Dashboard</a>
+                <a href="#records">Records</a>
+                <a href="#settings">Settings</a>
             </nav>
         </div>
     </header>
@@ -27,12 +28,12 @@
 
                 <article class="cards">
                     <h3>Total Records</h3>
-                    <p id="total-duration">0</p>
+                    <p id="total-records">0</p>
                 </article>
 
                 <article class="cards">
                     <h3>Total  Duration</h3>
-                    <P id="total-duration">0</P>
+                    <p id="total-duration">0</p>
                 </article>
 
                 <article class="cards">
@@ -41,17 +42,17 @@
                 </article>
 
                 <article class="cards">
-                    <h3>Weeky Target</h3>
+                    <h3>Weekly Target</h3>
                     <p id="target">Not set</p>
                 </article>
             </div>
             </section>
             <section id="add-record">
-                <h3>Add a record</h3>
+                <h3 id="form-heading">Add a record</h3>
                 <form id="record" novalidate>
                     <div>
                         <label for="title">Title</label>
-                        <input type="text" id="title" name="title" placeholder="Enter a tast or event" aria-describedby="title-error" autocomplete="off">
+                        <input type="text" id="title" name="title" placeholder="Enter a task or event" aria-describedby="title-error" autocomplete="off">
                         <span id="title-error" class="error-text"></span>
                     </div>
 
@@ -83,7 +84,8 @@
 
                 <div>
                     <label for="search">Search records</label>
-                    <input type="search" id="search" placeholder="Searching..">
+                    <input type="search" id="search" placeholder="Searching..." 
+                    aria-describedby="search-message" autocomplete="off">
                 </div>
 
                 <div>
@@ -101,27 +103,14 @@
             <option value="duration-desc">Duration (longest first)</option>
         </select>
                 </div>
+                <p id="search-message" role="status"></p>
             </section>    
             <section id="records">
                 <h3>Record List</h3>
+                <p id="result-count" role="status"></p>
 
-                <div id="records-list">
-                    <article class="record">
-                        <div class="record-info">
-                        <h3>Complete programming assignment</h3>
-                        <p>Date: 2026-10-15</p>
-                        <p>Duration: 2 hours</p>
-                        <p>Tag: Study</p>
-                        </div>
-
-                        <div class="recorde-actions">
-                        <button type="button" class="edit-button">Edit</button>
-                        <button type="button" class="delete-button">Delete</button>
-                        </div>
-                    </article>
-                </div>
+                <div id="records-list"></div>
             </section>
-        </section>
     </main>
     <footer>
         <h3>About and Contact</h3>

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tests</title>
+    <link rel="icon" href="data:,">
     <style>
         body {
             font-family: Verdana, Geneva, Tahoma, sans-serif;
@@ -30,6 +31,12 @@
         import {
             patterns, validateTitle, validateDate, validateDuration, validateTag, isRealDate, normalizeTitle, validateRecord
         } from './Scripts/validator.js';
+        import {
+            escapeHtml, compileRegex, highlight 
+        } from './Scripts/search.js';
+        import {
+            sortRecords
+        } from './Scripts/state.js'
 
         let passed = 0, failed = 0;
         const list = document.getElementById('results');
@@ -88,6 +95,30 @@
         test('validateRecord: bad form reports each bad field',
             Object.keys(validateRecord({ title: '', date: 'nope', duration: '007', tag: '1'})).length,4
         );
+
+        test('escapeHtml: < and > are escaped', escapeHtml('<b>'), '&lt;b&gt;');
+        test('compileRegex: empty box gives no regex', compileRegex('').re, null);
+        test('compileRegex: good patterns works', compileRegex('^st').re instanceof RegExp, true);
+        test('compileRegex: broken pattern gives an error, not a crash', compileRegex('[abc').error !== '', true);
+        test('compileRegex: ignores case by default', compileRegex('study').re.test('STUDY'), true);
+        test('compileRegex: case-sensitive when asked', compileRegex('study', true).re.test('STUDY'), false);
+        test('highlight: wraps the match in <mark>', highlight('Study hard', /study/i), '<mark>Study</mark> hard');
+        test('highlight: marks every match', highlight('a b a', /a/i), '<mark>a</mark> b <mark>a</mark>');
+        test('highlight: escape HTML in the text', highlight('<b>x</b>', /x/i), '&lt;b&gt;<mark>x</mark>&lt;/b&gt;');
+        test('highlight: no regex just escapes', highlight('<i>', null), '&lt;i&gt;');
+        test('highlight: empty matches do not hang', highlight('abc', /x*/), 'abc');
+         
+        const sample = [
+            {title: 'b', dueDate: '2026-02-01', duration: 10},
+            {title: 'a', dueDate: '2026-03-01', duration: 30},
+            {title: 'c', dueDate: '2026-01-01', duration: 20},
+        ];
+
+        test('sort: date oldest first', sortRecords(sample, 'date-asc').map((r) => r.title).join(''), 'cba');
+        test('sort: date newest first', sortRecords(sample, 'date-desc').map((r) => r.title).join(''), 'abc');
+        test('sort: title A-Z', sortRecords(sample, 'title-asc').map((r) => r.title).join(''), 'abc');
+        test('sort: duration longest first', sortRecords(sample, 'duration-desc').map((r) => r.title).join(''), 'acb');
+        test('sort: original list is not changed', sample[0].title, 'b');
 
         document.getElementById('Summary').textContent = `${passed} passed, ${failed} failed.`;
     </script>
