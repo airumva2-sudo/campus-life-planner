@@ -1,7 +1,8 @@
 import { validateRecord, normalizeTitle } from './validator.js';
 import { state, loadSeed, addRecord, updateRecord, deleteRecord, getRecord, sortRecords } from './state.js';
 import { compileRegex } from './search.js';
-import { renderRecords } from './ui.js';
+import { renderRecords, renderStats, renderCap } from './ui.js';
+import { computeStats, capStatus, validateCap } from './stats.js';
 
 const form = document.querySelector('#record');
 const status = document.querySelector('#form-status');
@@ -25,6 +26,9 @@ function refresh() {
     }
     shown = sortRecords(shown, sortMenu.value);
     renderRecords(shown, re);
+    const stats = computeStats(state.records);
+    renderStates(stats, state.cap);
+    renderCap(capStatus(stats.totalDuration, state.cap));
     resultCount.textContent = `Showing ${shown.length} of ${state.records.length} records.`;  
 }
 
@@ -118,6 +122,30 @@ list.addEventListener('click', (event) => {
         document.querySelector('#title').focus();
     }
 }); 
+const capFrom = document.querySelector('#cap-form');
+const capInput = document.querySelector('#cap');
+const capError = document.querySelector('#cap-error');
+const capSaved = document.querySelector('#cap-status');
+
+capFrom.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const message = validateCap(capInput.value);
+    capError.textContent = message;
+    if (message) {
+        capInput.setAttribute('aria-invalid', 'true');
+        capInput.focus();
+        capSaved.textContent = '';
+        return;
+    }
+    capInput.removeAttribute('aria-invalid');
+    state.cap = Number(capInput.value);
+    capSaved.textContent = state.cap ? 'Weekly target saved.' : 'Weekly target removed.';
+    refresh();
+});
+capInput.addEventListener('input', () =>{
+    capError.textContent = '';
+    capInput.removeAttribute('aria-invalid');
+});
 
 await loadSeed();
 refresh();

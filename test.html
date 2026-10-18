@@ -36,7 +36,10 @@
         } from './Scripts/search.js';
         import {
             sortRecords
-        } from './Scripts/state.js'
+        } from './Scripts/state.js';
+        import {
+            computeStats, capStatus, validateCap, round2, toDateString
+        } from './Scripts/stats.js';
 
         let passed = 0, failed = 0;
         const list = document.getElementById('results');
@@ -119,6 +122,48 @@
         test('sort: title A-Z', sortRecords(sample, 'title-asc').map((r) => r.title).join(''), 'abc');
         test('sort: duration longest first', sortRecords(sample, 'duration-desc').map((r) => r.title).join(''), 'acb');
         test('sort: original list is not changed', sample[0].title, 'b');
+
+        const rows = [
+            {dueDate: '2026-10-18', duration: 30, tag: 'School'},
+            {dueDate: '2026-10-18', duration:15.5, tag: 'school'},
+            {dueDate: '2026-10-16', duration:60, tag: 'Health'},
+            {dueDate: '2026-01-01', duration: 0.25, tag:'Health'}
+        ]
+
+        const today = new Date(2026, 9, 18);
+        const stats = computeStats(rows, today);
+        test('stats:total records', stats.totalRecords, 4);
+        test('stats: total duration', stats.totalDuration, 105.75);
+        test('stats: most used tag ignores capital letters', computeStats([
+            {dueDate: '2026-10-10', duration: 5, tag:'School'},
+            {dueDate: '2026-11-09', duration: 10, tag:'school'},
+            {dueDate: '2026-10-20', duration: 5, tag:'Health'}
+        ], today).topTag, 'School');
+        test('stats: tie is settled alphabetically', computeStats([
+            {dueDate: '2026-10-10', duration: 1, tag:'B'},
+            {dueDate: '2026-10-18', duration: 5, tag:'A'}
+        ], today).topTag, 'A');
+        test('stats: no records gives None', computeStats([], today).topTag, 'None');
+        test('stats: trend has 7 days', stats.trend.length, 7);
+        test('stats: trend starts 6 days ago', stats.trend[0].date, '2026-10-12');
+        test('stats: trend ends today', stats.trend[6].date, '2026-10-18');
+        test('stats: trend adds up minutes for a day', stats.trend[6].minutes, 45.5);
+        test('stats: trend day with nothing is 0', stats.trend[5].minutes, 0);
+        test('stats: trend ignores old records', stats.trend.reduce((a, d) => a + d.minutes, 0), 105.5);
+        test('round2: floating point fixed', round2(0.1 + 0.2), 0.3);
+        test('toDateString: pads month and day', toDateString(new Date(2026, 0, 5)), '2026-01-05');
+
+        test('cap: no cap gives null', capStatus(100, 0), null);
+        test('cap: under is polite', capStatus(100, 600).level, 'polite');
+        test('cap: under message', capStatus(100, 600).text, '500 minutes remaining of your 600 minute target.');
+        test('cap: exactly at the cap is polite', capStatus(600, 600).level, 'polite');
+        test('cap: over is assertive', capStatus(700, 600).level, 'assertive');
+        test('cap: over message', capStatus(700.5, 600).text, 'Over your weekly target by 100.5 minutes!');
+        test('validateCap: empty rejected', validateCap('') !==  '', true);
+        test('validateCap: 600 ok', validateCap('600'), '');
+        test('validateCap: 0 ok', validateCap('0'), '');
+        test('validateCap: -5 rejected', validateCap('-5') !== '', true);
+        test('validateCap: letters rejected', validateCap('abc') !== '', true);
 
         document.getElementById('Summary').textContent = `${passed} passed, ${failed} failed.`;
     </script>

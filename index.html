@@ -46,6 +46,10 @@
                     <p id="target">Not set</p>
                 </article>
             </div>
+            <p id="cap-polite" class="cap cap-ok" aria-live="polite"></p>
+            <p id="cap-assertive" class="cap cap-over" aria-live="assertive"></p>
+            <h3 class="chart-title">Planned minutes, last 7 days</h3>
+            <ul id="trend-chart" class="chart" aria-label="Bar chart of planned minutes for the last 7 days"></ul>
             </section>
             <section id="add-record">
                 <h3 id="form-heading">Add a record</h3>
@@ -111,6 +115,20 @@
 
                 <div id="records-list"></div>
             </section>
+        <section id="settings">
+            <h3>Settings</h3>
+
+            <form id="cap-form" novalidate>
+                <div>
+                    <label for="cap">Weekly target (minutes, 0 = no target)</label>
+                    <input type="text" id="cap" name="cap" inputmode="decimal" placeholder="e.g: 600"
+                        aria-describedby="cap-error" autocomplete="off">
+                        <span id="cap-error" class="error-text"></span>
+                </div>
+                <button type="submit">Save target</button>
+                <p id="cap-status" role="status"></p>
+            </form>
+        </section>    
     </main>
     <footer>
         <h3>About and Contact</h3>

@@ -1,6 +1,7 @@
 export const state = {
     records: [],
     editingId:null,
+    cap: 0,
 };
 
 export async function loadSeed() {
